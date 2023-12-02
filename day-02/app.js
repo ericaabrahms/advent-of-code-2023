@@ -13,6 +13,9 @@ lineReader.on('line', function (line) {
 lineReader.on('close', function () {
     total = games.reduce(sumGameNumbers, 0)
     console.log('Total', total)
+
+    const powerSum = games.reduce(sumAllPowers, 0)
+    console.log('power sum', powerSum)
 });
 
 function parseLine(line) {
@@ -63,4 +66,13 @@ function sumGameNumbers(acc, curr, index) {
         acc += index
     }
     return acc
+}
+
+function getPower(g) {
+    if (!g) return 0;
+    return g.green * g.red * g.blue
+}
+
+function sumAllPowers(acc, curr) {
+    return acc += getPower(curr)
 }
