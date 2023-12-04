@@ -4,6 +4,7 @@ var lineReader = require('readline').createInterface({
 
 const data = []
 let partNumberSum = 0
+let gearSum = 0
 
 lineReader.on('line', function (line) {
     // put textfile into data structure
@@ -15,7 +16,6 @@ lineReader.on('close', function () {
 
     data.forEach((row, rowIndex) => {
         let numberStart, numberEnd, number = '', isPartNumber = false
-        let previousIsDigit = false
         row.forEach((char, colIndex) => {
 
             if (isDigit(char)) {
@@ -51,10 +51,24 @@ lineReader.on('close', function () {
 
                 }
             }
+
+            if (isStar(char)) {
+                let prev = checkRowForAdjacentNumbers(data[rowIndex -1] || [], colIndex)
+                let curr = checkRowForAdjacentNumbers(row, colIndex, true)
+                let next = checkRowForAdjacentNumbers(data[rowIndex +1], colIndex)
+                let nums = [...prev, ...curr, ...next]
+                console.log(1, prev)
+                console.log(2, curr)
+                console.log(3, next)
+                if (nums.length === 2) {
+                    gearSum += nums[0] * nums[1]
+                }
+            }
         }) 
     })
 
     console.log('Part number sum:', partNumberSum)
+    console.log('Gear sum:', gearSum)
 });
 
 
@@ -69,6 +83,83 @@ function isDigit(char) {
 
     // digit
     return char.match(/\d/g)
+}
+
+function isStar(char) {
+    if (typeof char !== 'string') {return false}
+
+    // digit
+    return char.match(/\*/g)
+}
+
+function checkRowForAdjacentNumbers(row, i, skipMiddle) {
+    let adjacentNumbers = []
+    if (!row) return adjacentNumbers
+    if (hasTwoSeparateNumbers(row, i)) {
+        adjacentNumbers.push(getNumberForward(row, i + 1))
+        adjacentNumbers.push(getNumberBack(row, i - 1 ))
+    } else if (skipMiddle) {
+        if (isDigit(row[i -1])) {
+            adjacentNumbers.push(getNumberBack(row, i - 1))
+        } else if (isDigit(row[i+1])) {
+            adjacentNumbers.push(getNumberForward(row, i + 1))
+        }
+    } else if (isDigit(row[i -1])) {
+        if (getNumberBothWays(row, i - 1)) {
+            adjacentNumbers.push(getNumberBothWays(row, i - 1))
+        }
+    } else if (isDigit(row[i])) {
+        adjacentNumbers.push(getNumberForward(row, i))
+    } else if (isDigit(row[i + 1])) {
+        console.log('last digit', getNumberForward(row, i + 1))
+        adjacentNumbers.push(getNumberForward(row, i + 1))
+    } 
+    
+    return adjacentNumbers
+}
+
+function getNumberForward (row, i) {
+    let foundNonDigit = false 
+    let index = i
+    let number = ''
+    while (!foundNonDigit) {
+        if (isDigit(row[index])) {
+            number += row[index]
+            index++
+        } else {
+            foundNonDigit = true
+        }
+    }
+
+    return number
+}
+
+function getNumberBack(row, i) {
+    let foundNonDigit = false 
+    let index = i
+    let number = ''
+    while (!foundNonDigit) {
+        if (isDigit(row[index])) {
+            number = row[index] + number
+            index--
+        } else {
+            foundNonDigit = true
+        }
+    }
+
+    return number
+}
+
+function getNumberBothWays(row, i) {
+    let pre =  getNumberBack(row, i), post = getNumberForward(row, i+1)
+    return pre + post
+}
+
+function hasTwoSeparateNumbers(row, i) {
+    if (!row) return false
+    if (isDigit(row[i -1]) && isDigit(row[i + 1]) && !isDigit(row[i]) ) {
+        return true
+    }
 }
 
 function findAndStoreAdjacentDigits(rowIndex, colIndex) {
