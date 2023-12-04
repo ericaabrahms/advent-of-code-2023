@@ -1,5 +1,5 @@
 var lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('test-cases/number-is-last-of-row.txt')
+    input: require('fs').createReadStream(process.argv[2])
 });
 
 const data = []
@@ -21,40 +21,66 @@ lineReader.on('close', function () {
             if (isDigit(char)) {
                 number += char
                 if (!numberStart) { numberStart = colIndex }
-                previousIsDigit = true
 
                 if (!isDigit(row[colIndex + 1])) {
-                    console.log('woohoo')
+                    // console.log('woohoo')
+                    numberEnd = colIndex
+
+                    isPartNumber = (
+                        checkPartOfRowForSymbol(data[rowIndex -1], numberStart - 1, numberEnd + 1) ||
+                        checkPartOfRowForSymbol(data[rowIndex + 1], numberStart - 1, numberEnd + 1) ||
+                        isSymbol(row[numberStart - 1]) || 
+                        isSymbol(row[numberEnd + 1]) || 
+                        false
+                    )
+
+                    // Sum the part numbers
+                    if (isPartNumber) {
+                
+                        partNumberSum += parseInt(number)   
+
+                        
+                    } else {
+                        // console.log(rowIndex, number)
+                    }
+                    
+                    // reset start, end, number
+                    numberStart = ''
+                    numberStart = ''
+                    number = ''
+                    isPartNumber = false
+
                 }
-            } else if (previousIsDigit) {
-                previousIsDigit = false
-                numberEnd = colIndex -1
-
-            
-                isPartNumber = (
-                    checkPartOfRowForSymbol(data[rowIndex -1], numberStart - 1, numberEnd + 1) ||
-                    checkPartOfRowForSymbol(data[rowIndex + 1], numberStart - 1, numberEnd + 1) ||
-                    isSymbol(row[numberStart - 1]) || 
-                    isSymbol(row[numberEnd + 1]) || 
-                    false
-                )
-
-                // Sum the part numbers
-                if (isPartNumber) {
-            
-                    partNumberSum += parseInt(number)   
-                    console.log(1, rowIndex +1, parseInt(number))
-
-                } else {
-                    // console.log(rowIndex, number)
-                }
-
-                // reset start, end, number
-                numberStart = ''
-                numberStart = ''
-                number = ''
-                isPartNumber = false
             }
+            // } else if (previousIsDigit) {
+            //     previousIsDigit = false
+            //     numberEnd = colIndex -1
+
+            
+            //     isPartNumber = (
+            //         checkPartOfRowForSymbol(data[rowIndex -1], numberStart - 1, numberEnd + 1) ||
+            //         checkPartOfRowForSymbol(data[rowIndex + 1], numberStart - 1, numberEnd + 1) ||
+            //         isSymbol(row[numberStart - 1]) || 
+            //         isSymbol(row[numberEnd + 1]) || 
+            //         false
+            //     )
+
+            //     // Sum the part numbers
+            //     if (isPartNumber) {
+            
+            //         partNumberSum += parseInt(number)   
+            //         console.log(1, rowIndex +1, parseInt(number))
+
+            //     } else {
+            //         // console.log(rowIndex, number)
+            //     }
+
+            //     // reset start, end, number
+            //     numberStart = ''
+            //     numberStart = ''
+            //     number = ''
+            //     isPartNumber = false
+            // }
         }) 
     })
 
