@@ -66,17 +66,25 @@ function separateIntoNumbers(numStr) {
 function gameTwoCardHandler(row, index, array) {
     const count = getMatchCount(row)
 
-    // increment one card one time
-    for (let i = 0; i <= count; i++) {        
-        if (isNaN(cardCounts[index + i])) {
-            cardCounts[index + i] = 1;
-        } else cardCounts[index + i]++
-    }
+    
+        if (isNaN(cardCounts[index])) {
+            cardCounts[index] = 1;
+        } else cardCounts[index]++
 
-    const currentCardCount = cardCounts[index]
-    const pointValue = tallyPointsPerCard(count)
-    console.log(index, currentCardCount, pointValue)
-    gameTwoResult += (pointValue * currentCardCount)
+        let currentCardCount = cardCounts[index]
+
+        for (n = 0; n < currentCardCount; n++) {
+            // increment one card one time (not including for the card)
+            for (let i = 1; i <= count; i++) {        
+                if (isNaN(cardCounts[index + i])) {
+                    cardCounts[index + i] = 1;
+                } 
+                else {cardCounts[index + i]++}
+            }
+        }
+
+        currentCardCount = cardCounts[index]
+        gameTwoResult += currentCardCount
 
 
 }
