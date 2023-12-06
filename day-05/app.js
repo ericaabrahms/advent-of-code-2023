@@ -30,6 +30,24 @@ function findDestination(src, map) {
     return src
 }
 
+function getLowestLocationValueFromExpandedRange() {
+    let lowestValue
+    for (let i = 0; i < seeds.length; i = i+2) {
+        const seedRange = seeds[i + 1]
+        for (let j = 0; j < seedRange; j++) {
+            let seedId = seeds[i] + j
+            let location = getLocationFromSeedId(seedId)
+            if (!lowestValue) {
+                lowestValue = location
+            } else if (location < lowestValue) {
+                lowestValue = location
+            }
+        }
+    }
+
+    return lowestValue
+}
+ 
 const seedSoilMap = readMap('seed', 'soil')
 const soilFertilizerMap = readMap('soil', 'fertilizer')
 const fertilizerWaterMap = readMap('fertilizer', 'water')
@@ -44,35 +62,40 @@ const gameOneLocations = []
 seeds.forEach(populateLocationList(gameOneLocations))
 
 
-function populateLocationList(locationList) {
-    return (seedId) => {
-    // go through maps
-    
-        const location = findDestination( 
-            findDestination( 
+function getLocationFromSeedId (seedId) {
+    const location = findDestination( 
+        findDestination( 
+            findDestination(
                 findDestination(
                     findDestination(
                         findDestination(
                             findDestination(
-                                findDestination(
-                                    seedId,
-                                    seedSoilMap
-                                ),
-                                soilFertilizerMap,
+                                seedId,
+                                seedSoilMap
                             ),
-                            fertilizerWaterMap,
+                            soilFertilizerMap,
                         ),
-                        waterLightMap
+                        fertilizerWaterMap,
                     ),
-                    lightTemperatureMap                      
-                ), 
-                temperatureHumidityMap
-            ),
-            humidityLocationMap
-        )
-    
-        locationList.push(location)
+                    waterLightMap
+                ),
+                lightTemperatureMap                      
+            ), 
+            temperatureHumidityMap
+        ),
+        humidityLocationMap
+    )
+
+    return location
+}
+function populateLocationList(locationList) {
+    return (seedId) => {
+        locationList.push(getLocationFromSeedId(seedId))
     }
 }
+
 const gameOneLocationsSorted = gameOneLocations.sort((a, b) => a - b)
 console.log(`lowestGameOneLocation ${gameOneLocationsSorted[0]}`)
+
+let lowestGameTwoLocation = getLowestLocationValueFromExpandedRange()
+console.log(`lowest Game Two Location ${lowestGameTwoLocation}`)
