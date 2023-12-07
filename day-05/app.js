@@ -1,7 +1,4 @@
-const readline = require('readline')
 const fs = require('fs')
-const { once } = require('events');
-const { findSourceMap } = require('module');
 
 const seeds = [919339981,562444630,3366006921,67827214,1496677366,101156779,4140591657,5858311,2566406753,71724353,2721360939,35899538,383860877,424668759,3649554897,442182562,2846055542,49953829,2988140126,256306471]
 const result= 0;
@@ -56,35 +53,43 @@ const lightTemperatureMap = readMap('light', 'temperature')
 const temperatureHumidityMap = readMap('temperature', 'humidity')
 const humidityLocationMap = readMap('humidity', 'location')
 
-findDestination(seeds[0], seedSoilMap)
 
 const gameOneLocations = []
 seeds.forEach(populateLocationList(gameOneLocations))
+gameOneLocagtions = seeds.map(getLocationFromSeedId)
 
 
 function getLocationFromSeedId (seedId) {
-    const location = findDestination( 
-        findDestination( 
-            findDestination(
-                findDestination(
-                    findDestination(
-                        findDestination(
-                            findDestination(
-                                seedId,
-                                seedSoilMap
-                            ),
-                            soilFertilizerMap,
-                        ),
-                        fertilizerWaterMap,
-                    ),
-                    waterLightMap
-                ),
-                lightTemperatureMap                      
-            ), 
-            temperatureHumidityMap
-        ),
-        humidityLocationMap
-    )
+    const maps = [seedSoilMap, soilFertilizerMap, fertilizerWaterMap, waterLightMap, lightTemperatureMap, temperatureHumidityMap, humidityLocationMap]
+
+    currentId = seedId;
+    for (let map of maps) {
+        currentId = findDestination(currentId, map)
+    }
+
+    return currentId
+    // const location = findDestination( 
+    //     findDestination( 
+    //         findDestination(
+    //             findDestination(
+    //                 findDestination(
+    //                     findDestination(
+    //                         findDestination(
+    //                             seedId,
+    //                             seedSoilMap
+    //                         ),
+    //                         soilFertilizerMap,
+    //                     ),
+    //                     fertilizerWaterMap,
+    //                 ),
+    //                 waterLightMap
+    //             ),
+    //             lightTemperatureMap                      
+    //         ), 
+    //         temperatureHumidityMap
+    //     ),
+    //     humidityLocationMap
+    // )
 
     return location
 }
@@ -97,5 +102,5 @@ function populateLocationList(locationList) {
 const gameOneLocationsSorted = gameOneLocations.sort((a, b) => a - b)
 console.log(`lowestGameOneLocation ${gameOneLocationsSorted[0]}`)
 
-let lowestGameTwoLocation = getLowestLocationValueFromExpandedRange()
-console.log(`lowest Game Two Location ${lowestGameTwoLocation}`)
+// let lowestGameTwoLocation = getLowestLocationValueFromExpandedRange()
+// console.log(`lowest Game Two Location ${lowestGameTwoLocation}`)
