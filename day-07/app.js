@@ -16,7 +16,7 @@ const cardTypes = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', '
 const gameTwoCardTypes = ['J', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'Q', 'K', 'A']
 const handTypes = ['high-card', 'one-pair', 'two-pair', 'three-of-a-kind', 'full-house', 'four-of-a-kind', 'five-of-a-kind']
 
-function compareHands(playerA, playerB) {
+function gameOneSort(playerA, playerB) {
     const handRankA = handTypes.indexOf(determineHandType(playerA))
     const handRankB = handTypes.indexOf(determineHandType(playerB))
 
@@ -42,10 +42,10 @@ function compareHands(playerA, playerB) {
     return 0
 }
 
-function sortBasedOnCardRanking(cardRankingList = cardTypes) {
-    return (playerA, playerB) => {
-        const handRankA = handTypes.indexOf(determineHandType(playerA))
-        const handRankB = handTypes.indexOf(determineHandType(playerB))
+function gameTwoSort(playerA, playerB) {
+
+        const handRankA = handTypes.indexOf(determineHandType(playerA, true))
+        const handRankB = handTypes.indexOf(determineHandType(playerB, true))
     
         if (handRankA > handRankB) return 1
         else if (handRankA < handRankB) return -1
@@ -57,8 +57,8 @@ function sortBasedOnCardRanking(cardRankingList = cardTypes) {
                 const cardA = handA[i]
                 const cardB = handB[i]
                 if (cardA !== cardB) {
-                    cardRankA = cardRankingList.indexOf(cardA)
-                    cardRankB = cardRankingList.indexOf(cardB)
+                    cardRankA = gameTwoCardTypes.indexOf(cardA)
+                    cardRankB = gameTwoCardTypes.indexOf(cardB)
     
                     if (cardRankA > cardRankB) return 1
                     else if (cardRankA < cardRankB) return -1
@@ -67,10 +67,9 @@ function sortBasedOnCardRanking(cardRankingList = cardTypes) {
         }
         
         return 0
-    }
 }
 
-function determineHandType(player) {
+function determineHandType(player, useJokers) {
     const {hand} = player
 
     const cardCounts = hand.reduce((acc, curr) => {
@@ -81,6 +80,15 @@ function determineHandType(player) {
         }
         return acc
     }, {})
+
+    //  adjust for jokers
+
+    if (useJokers && cardCounts.J && cardCounts.J < 5) {
+        let cardWithHighestCount = findCardWithHighestCount(cardCounts)
+        cardCounts[cardWithHighestCount] = cardCounts[cardWithHighestCount] + cardCounts.J
+        
+        cardCounts.J = 0
+    }
 
 
     let hasThree = false; pairs = 0
@@ -103,12 +111,29 @@ function determineHandType(player) {
 
 }
 
-const gameOnePlayers = players.sort(sortBasedOnCardRanking())
+function findCardWithHighestCount(cardCounts) {
+    let highest 
+    let highestCount = 0
+    let cardTypes = Object.keys(cardCounts)
+    for (card of cardTypes) {
+        if (card !== 'J' && cardCounts[card] > highestCount) {
+            highestCount = cardCounts[card]
+            highest = card
+        }
+    }
+    return highest
+}
 
+const gameOnePlayers = players.sort(gameOneSort)
+const gameTwoPlayers = players.sort(gameTwoSort)
 function determineWinnings(player, index) {
     const rank = index + 1;
     return player.bid * rank;
 }
 
+
+
 const gameOneSum = gameOnePlayers.map(determineWinnings).reduce((curr, acc) => acc + curr, 0)
+const gameTwoSum = gameTwoPlayers.map(determineWinnings).reduce((curr, acc) => acc + curr, 0)
 console.log('Game one', gameOneSum)
+console.log('Game two', gameTwoSum)

@@ -1,0 +1,10 @@
+LR
+
+DDA = (DDB, XXX)
+DDB = (XXX, DDZ)
+DDZ = (DDB, XXX)
+MMA = (MMB, XXX)
+MMB = (MMC, MMC)
+MMC = (MMZ, MMZ)
+MMZ = (MMB, MMB)
+XXX = (XXX, XXX)
