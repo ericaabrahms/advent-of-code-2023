@@ -1,4 +1,5 @@
-const fs = require('fs')
+const fs = require('fs');
+const { start } = require('repl');
 
 function readFile(filename) {
     const fileContents = fs.readFileSync(filename, 'utf-8').trim().split(/\r?\n/);
@@ -57,6 +58,11 @@ function computeStepsGhostMode(startingPoints) {
             reachedEnd = true
         }
 
+
+        if (steps % 1000000000 === 0) {
+            console.log(steps)
+        }
+
     }
 
     return steps
@@ -64,4 +70,8 @@ function computeStepsGhostMode(startingPoints) {
 }
 
 console.log('Game one:', computeStepsToZZZ())
+// console.log('Game two:', computeStepsGhostMode(gameTwoStartingPoints))
 console.log('Game two:', computeStepsGhostMode(gameTwoStartingPoints))
+
+
+// const timesToGetBackToStart = gameTwoStartingPoints.map(computeTimesToGetBackToStart) 
